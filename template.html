@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gesture AI – Educational Version</title>
+
+  <!-- ===============================
+       PHẦN A – THƯ VIỆN (KHÔNG SỬA)
+       =============================== -->
+  <!-- MediaPipe Hands: AI nhận diện tay -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #444;
+      margin-top: 10px;
+    }
+    #status {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>✋ Điều khiển bằng cử chỉ tay</h2>
+  <p>Mở tay – Nắm tay – Pinch</p>
+
+  <!-- Video camera (ẩn) -->
+  <video class="input_video" style="display:none"></video>
+
+  <!-- Canvas để xem camera -->
+  <canvas id="preview" width="320" height="240"></canvas>
+
+  <!-- Hiển thị gesture -->
+  <div id="status">Gesture: NONE</div>
+
+  <script>
+    /* =====================================================
+       PHẦN B – KHỞI TẠO CAMERA + AI (KHÔNG SỬA)
+       ===================================================== */
+
+    const video = document.querySelector(".input_video");
+    const canvas = document.getElementById("preview");
+    const ctx = canvas.getContext("2d");
+
+    const hands = new Hands({
+      locateFile: file =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await hands.send({ image: video });
+      },
+      width: 320,
+      height: 240
+    });
+
+    camera.start();
+
+    /* =====================================================
+       PHẦN C – HÀM TOÁN HỌC & GESTURE (BẮT BUỘC HIỂU)
+       ===================================================== */
+
+    // Hàm tính khoảng cách giữa 2 điểm (toán học)
+    function distance(p1, p2) {
+      return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    }
+
+    // Các điểm quan trọng trên bàn tay
+    const WRIST = 0;
+    const THUMB_TIP = 4;
+    const INDEX_TIP = 8;
+    const tips = [8, 12, 16, 20];
+
+    /**
+     * Hàm phát hiện cử chỉ tay
+     * INPUT: landmarks (21 điểm từ AI)
+     * OUTPUT: "FIST" | "OPEN" | "PINCH"
+     */
+    function detectGesture(landmarks) {
+      // 1. Tính độ mở của bàn tay
+      let openDist = 0;
+      tips.forEach(i => {
+        openDist += distance(landmarks[i], landmarks[WRIST]);
+      });
+      const avgDist = openDist / tips.length;
+
+      // 2. Tính khoảng cách pinch
+      const pinchDist = distance(
+        landmarks[THUMB_TIP],
+        landmarks[INDEX_TIP]
+      );
+
+      // 3. Quy tắc nhận diện gesture
+      if (avgDist < 0.25) return "FIST";      // ✊ Nắm tay
+      if (pinchDist < 0.05) return "PINCH";  // 🤏 Pinch
+      return "OPEN";                          // 🖐 Mở tay
+    }
+
+    /* =====================================================
+       PHẦN D – GESTURE → LOGIC (HỌC SINH / AI SỬA)
+       ===================================================== */
+
+    let currentGesture = "NONE";
+
+    hands.onResults(results => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+      if (results.multiHandLandmarks.length > 0) {
+        const landmarks = results.multiHandLandmarks[0];
+        currentGesture = detectGesture(landmarks);
+      } else {
+        currentGesture = "NONE";
+      }
+
+      document.getElementById("status").innerText =
+        "Gesture: " + currentGesture;
+
+      // ===================================================
+      // 🔥🔥🔥 KHU VỰC HỌC SINH + GENAI CAN THIỆP 🔥🔥🔥
+      // ===================================================
+
+      /**
+       * BÀI TOÁN:
+       * - Khi gesture thay đổi → ứng dụng thay đổi
+       *
+       * HỌC SINH CÓ THỂ:
+       * - Dùng if / switch
+       * - Copy code do AI sinh ra vào đây
+       *
+       * VÍ DỤ PROMPT:
+       * "Khi gesture là OPEN, đổi màu nền sang xanh.
+       *  Khi FIST, đổi sang đỏ.
+       *  Khi PINCH, đổi sang vàng."
+       */
+
+      if (currentGesture === "OPEN") {
+        // TODO: CODE DO HỌC SINH / AI VIẾT
+        document.body.style.background = "#2ecc71";
+      }
+
+      else if (currentGesture === "FIST") {
+        // TODO: CODE DO HỌC SINH / AI VIẾT
+        document.body.style.background = "#e74c3c";
+      }
+
+      else if (currentGesture === "PINCH") {
+        // TODO: CODE DO HỌC SINH / AI VIẾT
+        document.body.style.background = "#f1c40f";
+      }
+
+      else {
+        document.body.style.background = "#111";
+      }
+
+      // ===================================================
+      // 🔥🔥🔥 KẾT THÚC KHU VỰC SÁNG TẠO 🔥🔥🔥
+      // ===================================================
+    });
+
+    /* =====================================================
+       PHẦN E – MỞ RỘNG (OPTIONAL)
+       ===================================================== */
+    /*
+      Gợi ý cho học sinh:
+      - Điều khiển game
+      - Vẽ canvas
+      - Phát nhạc
+      - Điều khiển slide
+      - Điều khiển robot
+    */
+  </script>
+
+</body>
+</html>
