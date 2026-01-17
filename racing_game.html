@@ -352,7 +352,177 @@
 
         .start-screen p {
             color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* Hand Sign Guide */
+        .hand-guide {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hand-sign {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .hand-sign:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-pink);
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+        }
+
+        .hand-sign .hand-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .hand-sign:nth-child(1) .hand-icon {
+            animation-delay: 0s;
+        }
+
+        .hand-sign:nth-child(2) .hand-icon {
+            animation-delay: 0.3s;
+        }
+
+        .hand-sign:nth-child(3) .hand-icon {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hand-sign .hand-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .hand-sign .hand-action {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Difficulty Selector */
+        .difficulty-selector {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .difficulty-btn {
+            padding: 12px 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            color: white;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .difficulty-btn.active {
+            background: var(--neon-pink);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        .difficulty-btn.easy {
+            border-color: var(--neon-green);
+        }
+
+        .difficulty-btn.easy.active {
+            background: var(--neon-green);
+            box-shadow: 0 0 20px var(--neon-green);
+            color: black;
+        }
+
+        .difficulty-btn.normal {
+            border-color: var(--neon-blue);
+        }
+
+        .difficulty-btn.normal.active {
+            background: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            color: black;
+        }
+
+        .difficulty-btn.hard {
+            border-color: var(--neon-orange);
+        }
+
+        .difficulty-btn.hard.active {
+            background: var(--neon-orange);
+            box-shadow: 0 0 20px var(--neon-orange);
+            color: black;
+        }
+
+        .difficulty-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+            margin-bottom: 10px;
+        }
+
+        .hand-sign.left {
+            border-color: var(--neon-orange);
+        }
+
+        .hand-sign.left:hover {
+            box-shadow: 0 10px 30px rgba(255, 102, 0, 0.3);
+        }
+
+        .hand-sign.left .hand-name {
+            color: var(--neon-orange);
+        }
+
+        .hand-sign.right {
+            border-color: var(--neon-green);
+        }
+
+        .hand-sign.right:hover {
+            box-shadow: 0 10px 30px rgba(0, 255, 102, 0.3);
+        }
+
+        .hand-sign.right .hand-name {
+            color: var(--neon-green);
+        }
+
+        .hand-sign.nitro {
+            border-color: var(--neon-blue);
+        }
+
+        .hand-sign.nitro:hover {
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.3);
+        }
+
+        .hand-sign.nitro .hand-name {
+            color: var(--neon-blue);
         }
 
         .start-btn {
@@ -429,7 +599,35 @@
             <!-- Start Screen -->
             <div class="start-screen" id="startScreen">
                 <h1>🏎️ GESTURE RACER</h1>
-                <p>Điều khiển xe bằng cử chỉ tay</p>
+                <p>Điều khiển xe bằng cử chỉ tay - Underground Style</p>
+
+                <!-- Hand Sign Guide - LOGIC MỚI -->
+                <div class="hand-guide">
+                    <div class="hand-sign left">
+                        <span class="hand-icon">✊🖐️</span>
+                        <div class="hand-name">THẢ TRÁI</div>
+                        <div class="hand-action">← Sang trái</div>
+                    </div>
+                    <div class="hand-sign right">
+                        <span class="hand-icon">🖐️✊</span>
+                        <div class="hand-name">THẢ PHẢI</div>
+                        <div class="hand-action">Sang phải →</div>
+                    </div>
+                    <div class="hand-sign nitro">
+                        <span class="hand-icon">🖐️🖐️</span>
+                        <div class="hand-name">THẢ 2 TAY</div>
+                        <div class="hand-action">⚡ NITRO!</div>
+                    </div>
+                </div>
+
+                <!-- Difficulty Selector -->
+                <div class="difficulty-label">🎮 CHỌN ĐỘ KHÓ</div>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn easy" data-difficulty="easy">😊 DỄ</button>
+                    <button class="difficulty-btn normal active" data-difficulty="normal">😐 TRUNG BÌNH</button>
+                    <button class="difficulty-btn hard" data-difficulty="hard">😈 KHÓ</button>
+                </div>
+
                 <button class="start-btn" id="startBtn">▶ START GAME</button>
             </div>
 
@@ -452,36 +650,36 @@
             </div>
 
             <div class="controls-guide">
-                <div class="panel-title" style="margin-top: 15px;">🎮 ĐIỀU KHIỂN</div>
+                <div class="panel-title" style="margin-top: 15px;">🎮 ĐIỀU KHIỂN MỚI</div>
 
-                <div class="control-item" id="ctrl-open">
-                    <div class="control-emoji">🖐️</div>
+                <div class="control-item" id="ctrl-left">
+                    <div class="control-emoji">✊🖐️</div>
                     <div class="control-info">
-                        <div class="control-name">Mở tay</div>
-                        <div class="control-desc">Sang phải →</div>
-                    </div>
-                </div>
-
-                <div class="control-item" id="ctrl-fist">
-                    <div class="control-emoji">✊</div>
-                    <div class="control-info">
-                        <div class="control-name">Nắm tay</div>
+                        <div class="control-name">Thả tay trái</div>
                         <div class="control-desc">← Sang trái</div>
                     </div>
                 </div>
 
-                <div class="control-item" id="ctrl-pinch">
-                    <div class="control-emoji">🤏</div>
+                <div class="control-item" id="ctrl-right">
+                    <div class="control-emoji">🖐️✊</div>
                     <div class="control-info">
-                        <div class="control-name">Pinch</div>
+                        <div class="control-name">Thả tay phải</div>
+                        <div class="control-desc">Sang phải →</div>
+                    </div>
+                </div>
+
+                <div class="control-item" id="ctrl-nitro">
+                    <div class="control-emoji">🖐️🖐️</div>
+                    <div class="control-info">
+                        <div class="control-name">Thả cả 2 tay</div>
                         <div class="control-desc">⚡ NITRO BOOST!</div>
                     </div>
                 </div>
 
-                <div class="control-item" id="ctrl-none">
-                    <div class="control-emoji">✋</div>
+                <div class="control-item" id="ctrl-hold">
+                    <div class="control-emoji">✊✊</div>
                     <div class="control-info">
-                        <div class="control-name">Không có tay</div>
+                        <div class="control-name">Nắm cả 2 tay</div>
                         <div class="control-desc">Giữ nguyên vị trí</div>
                     </div>
                 </div>
@@ -491,20 +689,75 @@
 
     <script>
         // ========================================
-        // GAME CONFIG
+        // DIFFICULTY PRESETS
         // ========================================
-        const CONFIG = {
-            lanes: 3,
-            laneWidth: 120,
-            carWidth: 60,
-            carHeight: 100,
-            obstacleHeight: 80,
-            initialSpeed: 5,
-            maxSpeed: 15,
-            nitroSpeed: 25,
-            speedIncrement: 0.002,
-            obstacleFrequency: 0.02
+        const DIFFICULTY = {
+            easy: {
+                initialSpeed: 3,
+                maxSpeed: 7,
+                nitroSpeed: 12,
+                speedIncrement: 0.001,
+                obstacleFrequency: 0.006,
+                name: '😊 DỄ'
+            },
+            normal: {
+                initialSpeed: 4,
+                maxSpeed: 10,
+                nitroSpeed: 18,
+                speedIncrement: 0.0015,
+                obstacleFrequency: 0.01,
+                name: '😐 TRUNG BÌNH'
+            },
+            hard: {
+                initialSpeed: 6,
+                maxSpeed: 15,
+                nitroSpeed: 25,
+                speedIncrement: 0.003,
+                obstacleFrequency: 0.018,
+                name: '😈 KHÓ'
+            }
         };
+
+        let currentDifficulty = 'normal';
+
+        // ========================================
+        // GAME CONFIG - CÂN BẰNG
+        // ========================================
+        let CONFIG = {
+            lanes: 3,
+            laneWidth: 150,
+            carWidth: 50,
+            carHeight: 90,
+            obstacleHeight: 70,
+            ...DIFFICULTY.normal  // Default to normal
+        };
+
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            CONFIG = {
+                lanes: 3,
+                laneWidth: 150,
+                carWidth: 50,
+                carHeight: 90,
+                obstacleHeight: 70,
+                ...DIFFICULTY[level]
+            };
+
+            // Update UI
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.difficulty === level) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Setup difficulty buttons
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setDifficulty(btn.dataset.difficulty);
+            });
+        });
 
         // ========================================
         // GAME STATE
@@ -559,47 +812,86 @@
         }
 
         // ========================================
-        // MEDIAPIPE HANDS
+        // MEDIAPIPE HANDS - TRACK 2 TAY
         // ========================================
         const hands = new Hands({
             locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
         });
 
         hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.7
+            maxNumHands: 2,  // Track 2 tay
+            modelComplexity: 0,  // Giảm từ 1 xuống 0 để nhẹ hơn
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.4
         });
+
+        let cameraError = false;
+        let lastFrameTime = 0;
+        const frameInterval = 50;  // Giới hạn 20 FPS để giảm tải CPU
+        let errorCount = 0;
 
         const camera = new Camera(video, {
             onFrame: async () => {
-                await hands.send({ image: video });
+                // Throttle để giảm tải CPU
+                const now = Date.now();
+                if (now - lastFrameTime < frameInterval) return;
+                lastFrameTime = now;
+
+                if (cameraError) return;
+                try {
+                    await hands.send({ image: video });
+                    errorCount = 0;  // Reset error count khi thành công
+                } catch (e) {
+                    errorCount++;
+                    console.error("Camera error:", e, "Count:", errorCount);
+
+                    // Chỉ đánh dấu lỗi nghiêm trọng sau 5 lần liên tiếp
+                    if (errorCount > 5) {
+                        cameraError = true;
+                        document.getElementById('gestureEmoji').textContent = '❌';
+                        document.getElementById('gestureAction').textContent = 'Lỗi camera';
+                    }
+                }
             },
             width: 280,
             height: 210
         });
 
-        camera.start();
+        camera.start().catch(err => {
+            console.error("Không thể khởi động camera:", err);
+            cameraError = true;
+            document.getElementById('gestureEmoji').textContent = '❌';
+            document.getElementById('gestureAction').textContent = 'Lỗi camera';
+        });
 
         // Gesture detection
         function distance(p1, p2) {
             return Math.hypot(p1.x - p2.x, p1.y - p2.y);
         }
 
-        function detectGesture(landmarks) {
-            const tips = [8, 12, 16, 20];
-            let openDist = 0;
-            tips.forEach(i => {
-                openDist += distance(landmarks[i], landmarks[0]);
-            });
-            const avgDist = openDist / tips.length;
-            const pinchDist = distance(landmarks[4], landmarks[8]);
+        // Kiểm tra tay có nắm hay không - cải thiện độ chính xác
+        function isFist(landmarks) {
+            // Kiểm tra 4 ngón (trừ ngón cái)
+            const tips = [8, 12, 16, 20];  // Đầu ngón tay
+            const pips = [6, 10, 14, 18];  // Khớp giữa ngón tay
 
-            if (pinchDist < 0.05) return "PINCH";
-            if (avgDist < 0.25) return "FIST";
-            return "OPEN";
+            let fistScore = 0;
+            for (let i = 0; i < tips.length; i++) {
+                // Nếu đầu ngón thấp hơn khớp giữa (y lớn hơn) = ngón gập
+                if (landmarks[tips[i]].y > landmarks[pips[i]].y) {
+                    fistScore++;
+                }
+            }
+
+            // Cần ít nhất 3/4 ngón gập để coi là nắm tay
+            return fistScore >= 3;
         }
+
+        // Track trạng thái 2 tay
+        let handStates = {
+            left: { detected: false, isFist: false },
+            right: { detected: false, isFist: false }
+        };
 
         hands.onResults(results => {
             // Draw camera
@@ -608,22 +900,73 @@
             cameraCtx.drawImage(results.image, -cameraCanvas.width, 0, cameraCanvas.width, cameraCanvas.height);
             cameraCtx.restore();
 
-            // Draw landmarks
-            if (results.multiHandLandmarks.length > 0) {
-                const landmarks = results.multiHandLandmarks[0];
-                gameState.gesture = detectGesture(landmarks);
+            // Reset trạng thái
+            handStates.left.detected = false;
+            handStates.right.detected = false;
 
-                // Draw hand
-                cameraCtx.strokeStyle = '#ff00ff';
-                cameraCtx.lineWidth = 2;
-                landmarks.forEach((point, i) => {
-                    const x = cameraCanvas.width - point.x * cameraCanvas.width;
-                    const y = point.y * cameraCanvas.height;
-                    cameraCtx.beginPath();
-                    cameraCtx.arc(x, y, 4, 0, 2 * Math.PI);
-                    cameraCtx.fillStyle = '#00f0ff';
-                    cameraCtx.fill();
-                });
+            // Xử lý từng tay
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                    const landmarks = results.multiHandLandmarks[i];
+
+                    // Kiểm tra multiHandedness có tồn tại
+                    let handedness = "Unknown";
+                    if (results.multiHandedness &&
+                        results.multiHandedness[i] &&
+                        results.multiHandedness[i].classification &&
+                        results.multiHandedness[i].classification[0]) {
+                        handedness = results.multiHandedness[i].classification[0].label;
+                    } else {
+                        // Nếu không có handedness, dùng vị trí x để đoán
+                        const wristX = landmarks[0].x;
+                        handedness = wristX > 0.5 ? "Right" : "Left";
+                    }
+
+                    // MediaPipe label ngược (Left = tay phải người dùng vì camera mirror)
+                    const isLeftHand = handedness === "Right";  // Tay trái user
+                    const isRightHand = handedness === "Left";  // Tay phải user
+
+                    const fist = isFist(landmarks);
+
+                    if (isLeftHand) {
+                        handStates.left.detected = true;
+                        handStates.left.isFist = fist;
+                    }
+                    if (isRightHand) {
+                        handStates.right.detected = true;
+                        handStates.right.isFist = fist;
+                    }
+
+                    // Vẽ tay với màu khác nhau
+                    const color = isLeftHand ? '#ff6600' : '#00ff66';  // Cam = trái, Xanh = phải
+                    landmarks.forEach((point, idx) => {
+                        const x = cameraCanvas.width - point.x * cameraCanvas.width;
+                        const y = point.y * cameraCanvas.height;
+                        cameraCtx.beginPath();
+                        cameraCtx.arc(x, y, 4, 0, 2 * Math.PI);
+                        cameraCtx.fillStyle = color;
+                        cameraCtx.fill();
+                    });
+                }
+            }
+
+            // Logic mới: 
+            // - Nắm 2 tay = giữ nguyên
+            // - Thả 2 tay = nitro
+            // - Nắm tay phải, thả tay trái = sang trái
+            // - Nắm tay trái, thả tay phải = sang phải
+
+            if (handStates.left.detected && handStates.right.detected) {
+                // Cả 2 tay detected
+                if (handStates.left.isFist && handStates.right.isFist) {
+                    gameState.gesture = "BOTH_FIST";  // Nắm 2 tay = giữ nguyên
+                } else if (!handStates.left.isFist && !handStates.right.isFist) {
+                    gameState.gesture = "BOTH_OPEN";  // Thả 2 tay = NITRO
+                } else if (!handStates.left.isFist && handStates.right.isFist) {
+                    gameState.gesture = "LEFT_OPEN";  // Thả trái, nắm phải = sang trái
+                } else if (handStates.left.isFist && !handStates.right.isFist) {
+                    gameState.gesture = "RIGHT_OPEN";  // Nắm trái, thả phải = sang phải
+                }
             } else {
                 gameState.gesture = "NONE";
             }
@@ -633,33 +976,34 @@
         });
 
         // ========================================
-        // GESTURE HANDLING
+        // GESTURE HANDLING - LOGIC MỚI
         // ========================================
         function handleGesture() {
             if (!gameState.isRunning) return;
 
             switch (gameState.gesture) {
-                case 'OPEN':
-                    if (gameState.targetLane < CONFIG.lanes - 1) {
-                        gameState.targetLane = Math.min(gameState.targetLane + 0.1, CONFIG.lanes - 1);
-                    }
-                    break;
-                case 'FIST':
+                case 'LEFT_OPEN':  // Thả tay trái = sang trái
                     if (gameState.targetLane > 0) {
-                        gameState.targetLane = Math.max(gameState.targetLane - 0.1, 0);
+                        gameState.targetLane = Math.max(gameState.targetLane - 0.08, 0);
                     }
+                    gameState.nitroActive = false;
                     break;
-                case 'PINCH':
+                case 'RIGHT_OPEN':  // Thả tay phải = sang phải
+                    if (gameState.targetLane < CONFIG.lanes - 1) {
+                        gameState.targetLane = Math.min(gameState.targetLane + 0.08, CONFIG.lanes - 1);
+                    }
+                    gameState.nitroActive = false;
+                    break;
+                case 'BOTH_OPEN':  // Thả cả 2 tay = NITRO!
                     if (gameState.nitro > 0) {
                         gameState.nitroActive = true;
                     }
                     break;
+                case 'BOTH_FIST':  // Nắm cả 2 tay = giữ nguyên
+                    gameState.nitroActive = false;
+                    break;
                 default:
                     gameState.nitroActive = false;
-            }
-
-            if (gameState.gesture !== 'PINCH') {
-                gameState.nitroActive = false;
             }
         }
 
@@ -668,10 +1012,11 @@
             const action = document.getElementById('gestureAction');
 
             const gestures = {
-                OPEN: { emoji: '🖐️', action: 'Sang phải →', ctrl: 'ctrl-open' },
-                FIST: { emoji: '✊', action: '← Sang trái', ctrl: 'ctrl-fist' },
-                PINCH: { emoji: '🤏', action: '⚡ NITRO!', ctrl: 'ctrl-pinch' },
-                NONE: { emoji: '👋', action: 'Giữ nguyên', ctrl: 'ctrl-none' }
+                LEFT_OPEN: { emoji: '👈', action: '← Sang trái', ctrl: 'ctrl-left' },
+                RIGHT_OPEN: { emoji: '👉', action: 'Sang phải →', ctrl: 'ctrl-right' },
+                BOTH_OPEN: { emoji: '🖐️🖐️', action: '⚡ NITRO!', ctrl: 'ctrl-nitro' },
+                BOTH_FIST: { emoji: '✊✊', action: 'Giữ nguyên', ctrl: 'ctrl-hold' },
+                NONE: { emoji: '👋', action: 'Đưa 2 tay vào...', ctrl: 'ctrl-none' }
             };
 
             const g = gestures[gameState.gesture] || gestures.NONE;
@@ -722,14 +1067,28 @@
                 }
             });
 
-            // Spawn obstacles
+            // Spawn obstacles - với kiểm tra để tránh spam và 3 xe ngang hàng
             if (Math.random() < CONFIG.obstacleFrequency * (gameState.speed / CONFIG.initialSpeed)) {
                 const lane = Math.floor(Math.random() * CONFIG.lanes);
-                gameState.obstacles.push({
-                    lane: lane,
-                    y: -CONFIG.obstacleHeight,
-                    type: Math.random() > 0.3 ? 'car' : 'barrier'
-                });
+
+                // Kiểm tra khoảng cách tối thiểu với obstacles khác trên cùng làn
+                const minDistance = 250;  // Khoảng cách tối thiểu (tăng lên)
+                const sameLineObstacles = gameState.obstacles.filter(obs => obs.lane === lane);
+                const tooClose = sameLineObstacles.some(obs => obs.y < minDistance);
+
+                // Kiểm tra số xe ở hàng trên cùng (y < 100) để tránh 3 xe ngang hàng
+                const topObstacles = gameState.obstacles.filter(obs => obs.y < 100);
+                const topLanes = [...new Set(topObstacles.map(obs => obs.lane))];
+                const willBlockAll = topLanes.length >= 2 && !topLanes.includes(lane);
+
+                // Chỉ spawn nếu không quá gần VÀ không chặn hết 3 làn
+                if (!tooClose && !willBlockAll && topLanes.length < 2) {
+                    gameState.obstacles.push({
+                        lane: lane,
+                        y: -CONFIG.obstacleHeight,
+                        type: Math.random() > 0.3 ? 'car' : 'barrier'
+                    });
+                }
             }
 
             // Update obstacles
