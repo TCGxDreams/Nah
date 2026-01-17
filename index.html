@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖐️ Hand Gesture AI - Nhận Diện Cử Chỉ Tay</title>
+
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --accent-open: #10b981;
+            --accent-fist: #ef4444;
+            --accent-pinch: #f59e0b;
+            --accent-none: #6366f1;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Animated Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Camera Section */
+        .camera-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .camera-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .camera-header .dot {
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .camera-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #preview {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 16px;
+        }
+
+        .input_video {
+            display: none;
+        }
+
+        /* Gesture Display */
+        .gesture-display {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .gesture-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        #gesture-name {
+            font-size: 2.5rem;
+            font-weight: 800;
+            transition: all 0.3s ease;
+        }
+
+        #gesture-emoji {
+            font-size: 4rem;
+            display: block;
+            margin-top: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        /* Info Section */
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Gesture Cards */
+        .gesture-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .gesture-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gesture-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .gesture-card.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .gesture-card.open.active {
+            border-color: var(--accent-open);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .gesture-card.fist.active {
+            border-color: var(--accent-fist);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+        }
+
+        .gesture-card.pinch.active {
+            border-color: var(--accent-pinch);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .gesture-card .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gesture-card .name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .gesture-card .desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .stats-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-none);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Landmarks Panel */
+        .landmarks-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .landmarks-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .landmarks-title h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .landmark-count {
+            background: var(--accent-none);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .fingers-status {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .finger {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .finger.extended {
+            background: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .finger.folded {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .finger .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .finger .name {
+            font-size: 0.625rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .finger .status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        footer a {
+            color: var(--accent-none);
+            text-decoration: none;
+        }
+
+        /* Glow effects based on gesture */
+        body.gesture-open {
+            background: linear-gradient(135deg, #0a0a0f 0%, #052e16 100%);
+        }
+
+        body.gesture-fist {
+            background: linear-gradient(135deg, #0a0a0f 0%, #450a0a 100%);
+        }
+
+        body.gesture-pinch {
+            background: linear-gradient(135deg, #0a0a0f 0%, #451a03 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">🖐️</div>
+            <h1>Hand Gesture AI</h1>
+            <p class="subtitle">Nhận diện cử chỉ tay real-time với MediaPipe</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Camera Section -->
+            <div class="camera-section">
+                <div class="camera-header">
+                    <div class="dot"></div>
+                    <span>Camera Live</span>
+                </div>
+
+                <div class="camera-container">
+                    <video class="input_video"></video>
+                    <canvas id="preview" width="640" height="480"></canvas>
+                </div>
+
+                <div class="gesture-display">
+                    <div class="gesture-label">Cử chỉ hiện tại</div>
+                    <div id="gesture-name">Đang chờ...</div>
+                    <div id="gesture-emoji">👋</div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <!-- Gesture Cards -->
+                <div class="gesture-cards">
+                    <div class="gesture-card open" data-gesture="OPEN">
+                        <div class="emoji">🖐️</div>
+                        <div class="name">Mở tay</div>
+                        <div class="desc">Duỗi tất cả ngón</div>
+                    </div>
+                    <div class="gesture-card fist" data-gesture="FIST">
+                        <div class="emoji">✊</div>
+                        <div class="name">Nắm tay</div>
+                        <div class="desc">Khép tất cả ngón</div>
+                    </div>
+                    <div class="gesture-card pinch" data-gesture="PINCH">
+                        <div class="emoji">🤏</div>
+                        <div class="name">Pinch</div>
+                        <div class="desc">Chạm ngón cái + trỏ</div>
+                    </div>
+                </div>
+
+                <!-- Stats Panel -->
+                <div class="stats-panel">
+                    <div class="stats-title">📊 Thống kê</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="fps">0</div>
+                            <div class="stat-label">FPS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="confidence">0%</div>
+                            <div class="stat-label">Độ tin cậy</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="gesture-count">0</div>
+                            <div class="stat-label">Số lần thay đổi</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="detection-time">0ms</div>
+                            <div class="stat-label">Thời gian xử lý</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Landmarks Panel -->
+                <div class="landmarks-panel">
+                    <div class="landmarks-title">
+                        <h3>📍 21 Điểm Backbone</h3>
+                        <span class="landmark-count">21 points</span>
+                    </div>
+                    <div class="fingers-status">
+                        <div class="finger" id="finger-thumb">
+                            <div class="icon">👍</div>
+                            <div class="name">Cái</div>
+                            <div class="status">--</div>
+                        </div>
+                        <div class="finger" id="finger-index">
+                            <div class="icon">☝️</div>
+                            <div class="name">Trỏ</div>
+                            <div class="status">--</div>
+                        </div>
+                        <div class="finger" id="finger-middle">
+                            <div class="icon">🖕</div>
+                            <div class="name">Giữa</div>
+                            <div class="status">--</div>
+                        </div>
+                        <div class="finger" id="finger-ring">
+                            <div class="icon">💍</div>
+                            <div class="name">Áp út</div>
+                            <div class="status">--</div>
+                        </div>
+                        <div class="finger" id="finger-pinky">
+                            <div class="icon">🤙</div>
+                            <div class="name">Út</div>
+                            <div class="status">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Sử dụng <a href="https://mediapipe.dev" target="_blank">MediaPipe Hands</a> của Google</p>
+            <p style="margin-top: 0.5rem;">Nhấn 'd' để bật/tắt vẽ 21 điểm</p>
+        </footer>
+    </div>
+
+    <script>
+        // ========================================
+        // KHỞI TẠO
+        // ========================================
+        const video = document.querySelector(".input_video");
+        const canvas = document.getElementById("preview");
+        const ctx = canvas.getContext("2d");
+
+        let currentGesture = "NONE";
+        let gestureCount = 0;
+        let lastGesture = "NONE";
+        let frameCount = 0;
+        let lastTime = performance.now();
+        let showLandmarks = true;
+
+        // 21 điểm backbone
+        const LANDMARKS = {
+            WRIST: 0,
+            THUMB_CMC: 1, THUMB_MCP: 2, THUMB_IP: 3, THUMB_TIP: 4,
+            INDEX_MCP: 5, INDEX_PIP: 6, INDEX_DIP: 7, INDEX_TIP: 8,
+            MIDDLE_MCP: 9, MIDDLE_PIP: 10, MIDDLE_DIP: 11, MIDDLE_TIP: 12,
+            RING_MCP: 13, RING_PIP: 14, RING_DIP: 15, RING_TIP: 16,
+            PINKY_MCP: 17, PINKY_PIP: 18, PINKY_DIP: 19, PINKY_TIP: 20
+        };
+
+        const CONNECTIONS = [
+            [0, 1], [1, 2], [2, 3], [3, 4],       // Thumb
+            [0, 5], [5, 6], [6, 7], [7, 8],       // Index
+            [0, 9], [9, 10], [10, 11], [11, 12],  // Middle
+            [0, 13], [13, 14], [14, 15], [15, 16], // Ring
+            [0, 17], [17, 18], [18, 19], [19, 20], // Pinky
+            [5, 9], [9, 13], [13, 17]              // Palm
+        ];
+
+        // ========================================
+        // MEDIAPIPE HANDS
+        // ========================================
+        const hands = new Hands({
+            locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.7
+        });
+
+        const camera = new Camera(video, {
+            onFrame: async () => {
+                const startTime = performance.now();
+                await hands.send({ image: video });
+                const endTime = performance.now();
+                document.getElementById("detection-time").textContent =
+                    Math.round(endTime - startTime) + "ms";
+            },
+            width: 640,
+            height: 480
+        });
+
+        camera.start();
+
+        // ========================================
+        // GESTURE DETECTION
+        // ========================================
+        function distance(p1, p2) {
+            return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        }
+
+        function isFingerExtended(landmarks, tipIdx, pipIdx, mcpIdx) {
+            const tip = landmarks[tipIdx];
+            const pip = landmarks[pipIdx];
+            const mcp = landmarks[mcpIdx];
+            return tip.y < pip.y && pip.y < mcp.y;
+        }
+
+        function isThumbExtended(landmarks) {
+            const thumbTip = landmarks[LANDMARKS.THUMB_TIP];
+            const thumbMcp = landmarks[LANDMARKS.THUMB_MCP];
+            const indexMcp = landmarks[LANDMARKS.INDEX_MCP];
+            return distance(thumbTip, indexMcp) > 0.1;
+        }
+
+        function detectGesture(landmarks) {
+            // Check each finger
+            const fingers = {
+                thumb: isThumbExtended(landmarks),
+                index: isFingerExtended(landmarks, 8, 6, 5),
+                middle: isFingerExtended(landmarks, 12, 10, 9),
+                ring: isFingerExtended(landmarks, 16, 14, 13),
+                pinky: isFingerExtended(landmarks, 20, 18, 17)
+            };
+
+            // Update finger status UI
+            updateFingerStatus(fingers);
+
+            // Count extended fingers
+            const extendedCount = Object.values(fingers).filter(v => v).length;
+
+            // Calculate distances
+            const tips = [8, 12, 16, 20];
+            let openDist = 0;
+            tips.forEach(i => {
+                openDist += distance(landmarks[i], landmarks[LANDMARKS.WRIST]);
+            });
+            const avgDist = openDist / tips.length;
+
+            const pinchDist = distance(
+                landmarks[LANDMARKS.THUMB_TIP],
+                landmarks[LANDMARKS.INDEX_TIP]
+            );
+
+            // Gesture logic
+            if (pinchDist < 0.05) return { gesture: "PINCH", fingers, confidence: 0.9 };
+            if (extendedCount <= 1 || avgDist < 0.25) return { gesture: "FIST", fingers, confidence: 0.85 };
+            if (extendedCount >= 4) return { gesture: "OPEN", fingers, confidence: 0.9 };
+
+            return { gesture: "NONE", fingers, confidence: 0.5 };
+        }
+
+        // ========================================
+        // DRAWING
+        // ========================================
+        function drawLandmarks(landmarks, gesture) {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const colors = {
+                OPEN: "#10b981",
+                FIST: "#ef4444",
+                PINCH: "#f59e0b",
+                NONE: "#6366f1"
+            };
+            const color = colors[gesture] || colors.NONE;
+
+            // Draw connections
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            CONNECTIONS.forEach(([i, j]) => {
+                const p1 = landmarks[i];
+                const p2 = landmarks[j];
+                ctx.beginPath();
+                ctx.moveTo(p1.x * w, p1.y * h);
+                ctx.lineTo(p2.x * w, p2.y * h);
+                ctx.stroke();
+            });
+
+            // Draw points with numbers
+            landmarks.forEach((point, i) => {
+                const x = point.x * w;
+                const y = point.y * h;
+
+                // Outer circle
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+
+                // Inner circle
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = "#ffffff";
+                ctx.fill();
+
+                // Number
+                ctx.fillStyle = "#000";
+                ctx.font = "bold 8px Inter, sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(i.toString(), x, y);
+            });
+        }
+
+        // ========================================
+        // UI UPDATES
+        // ========================================
+        function updateFingerStatus(fingers) {
+            const fingerMap = {
+                thumb: "finger-thumb",
+                index: "finger-index",
+                middle: "finger-middle",
+                ring: "finger-ring",
+                pinky: "finger-pinky"
+            };
+
+            Object.entries(fingers).forEach(([finger, extended]) => {
+                const el = document.getElementById(fingerMap[finger]);
+                el.classList.remove("extended", "folded");
+                el.classList.add(extended ? "extended" : "folded");
+                el.querySelector(".status").textContent = extended ? "Duỗi" : "Gập";
+            });
+        }
+
+        function updateGestureUI(gesture, confidence) {
+            const gestureName = document.getElementById("gesture-name");
+            const gestureEmoji = document.getElementById("gesture-emoji");
+
+            const gestureInfo = {
+                OPEN: { name: "Mở tay", emoji: "🖐️", class: "open" },
+                FIST: { name: "Nắm tay", emoji: "✊", class: "fist" },
+                PINCH: { name: "Pinch", emoji: "🤏", class: "pinch" },
+                NONE: { name: "Chờ phát hiện...", emoji: "👋", class: "" }
+            };
+
+            const info = gestureInfo[gesture] || gestureInfo.NONE;
+            gestureName.textContent = info.name;
+            gestureEmoji.textContent = info.emoji;
+
+            // Update confidence
+            document.getElementById("confidence").textContent =
+                Math.round(confidence * 100) + "%";
+
+            // Update cards
+            document.querySelectorAll(".gesture-card").forEach(card => {
+                card.classList.remove("active");
+                if (card.dataset.gesture === gesture) {
+                    card.classList.add("active");
+                }
+            });
+
+            // Update body class for background
+            document.body.className = "";
+            if (gesture !== "NONE") {
+                document.body.classList.add("gesture-" + gesture.toLowerCase());
+            }
+        }
+
+        function updateFPS() {
+            frameCount++;
+            const now = performance.now();
+            if (now - lastTime >= 1000) {
+                document.getElementById("fps").textContent = frameCount;
+                frameCount = 0;
+                lastTime = now;
+            }
+        }
+
+        // ========================================
+        // MAIN HANDLER
+        // ========================================
+        hands.onResults(results => {
+            // Clear and draw camera
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(results.image, -canvas.width, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+            updateFPS();
+
+            if (results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                const { gesture, fingers, confidence } = detectGesture(landmarks);
+
+                currentGesture = gesture;
+
+                // Count gesture changes
+                if (gesture !== lastGesture && gesture !== "NONE") {
+                    gestureCount++;
+                    document.getElementById("gesture-count").textContent = gestureCount;
+                    lastGesture = gesture;
+                }
+
+                // Draw landmarks
+                if (showLandmarks) {
+                    drawLandmarks(landmarks, gesture);
+                }
+
+                // Update UI
+                updateGestureUI(gesture, confidence);
+            } else {
+                currentGesture = "NONE";
+                updateGestureUI("NONE", 0);
+            }
+        });
+
+        // ========================================
+        // KEYBOARD CONTROLS
+        // ========================================
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "d" || e.key === "D") {
+                showLandmarks = !showLandmarks;
+                console.log("Show landmarks:", showLandmarks);
+            }
+        });
+    </script>
+</body>
+
+</html>
